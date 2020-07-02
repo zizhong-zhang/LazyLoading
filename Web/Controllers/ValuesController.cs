@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using Common;
 using System.Web.Http;
 
 namespace Web.Controllers
 {
     public class ValuesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        private readonly IGuidGenerator _guidGenerator;
+        public ValuesController(IGuidGenerator guidGenerator)
         {
-            return new string[] { "value1", "value2" };
+            _guidGenerator = guidGenerator;
+        }
+
+        // GET api/values
+        public IHttpActionResult Get()
+        {
+            return Ok(_guidGenerator.GetGuid());
         }
 
         // GET api/values/5
