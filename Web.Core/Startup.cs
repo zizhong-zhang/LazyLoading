@@ -26,8 +26,13 @@ namespace Web.Core
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IGuidGenerator, GuidGenerator>();
-            services.AddScoped<ITestGuidGenerator, TestGuidGenerator>();
+            services.AddScoped<IAuthorisation, Authorisation>();
+            services.AddScoped<IAuthorisationComparisionProvider, AuthorisationComparisionProvider>();
+            services.AddScoped<IAuthorisationLegacyProvider, AuthorisationLegacyProvider>();
+            services.AddScoped<IContextProvider, ContextProvider>();
+            services.AddScoped<ICachedContextProvider, CachedContextProvider>();
+            services.AddScoped<IAuthorisationProviderFactory, AuthorisationProviderFactory>();
+            
             services.AddControllers();
         }
 

@@ -8,7 +8,6 @@ namespace Web.App_Start
     using System.Web.Http;
     using Common;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-
     using Ninject;
     using Ninject.Web.Common;
     using Ninject.Web.Common.WebHost;
@@ -66,10 +65,22 @@ namespace Web.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<IGuidGenerator>().To<GuidGenerator>().InRequestScope();
-            kernel.Bind<ITestGuidGenerator>().To<TestGuidGenerator>().InRequestScope();
+            kernel.Bind<IAuthorisation>().To<Authorisation>().InRequestScope();
+            kernel.Bind<IAuthorisationLegacyProvider>().To<AuthorisationLegacyProvider>().InRequestScope();
+            kernel.Bind<IContextProvider>().To<ContextProvider>().InRequestScope();
+            kernel.Bind<ICachedContextProvider>().To<CachedContextProvider>().InRequestScope();
+            kernel.Bind<IAuthorisationProviderFactory>().ToMethod(ctx => new AuthorisationProviderFactory(ctx.Kernel)).InRequestScope();
 
-            kernel.Bind<IServiceProvider>().ToConstant(kernel).InSingletonScope();
+            // option 1
+            // kernel.Bind<IAuthorisationComparisionProvider>().To<AuthorisationComparisionProvider>().InRequestScope();
+            
+            // option 2
+            kernel.Bind<IAuthorisationComparisionProvider>().ToMethod(ctx=>
+            {
+                var legacyProvider = ctx.Kernel.Get<IAuthorisationLegacyProvider>();
+                var cachedContextProvider = ctx.Kernel.Get<ICachedContextProvider>();
+                return new AuthorisationComparisionProvider(cachedContextProvider, legacyProvider);
+            }).InRequestScope();
         }
     }
 }
