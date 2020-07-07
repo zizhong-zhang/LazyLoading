@@ -1,3 +1,5 @@
+using Ninject.Extensions.Factory;
+
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Web.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(Web.App_Start.NinjectWebCommon), "Stop")]
 
@@ -69,18 +71,8 @@ namespace Web.App_Start
             kernel.Bind<IAuthorisationLegacyProvider>().To<AuthorisationLegacyProvider>().InRequestScope();
             kernel.Bind<IContextProvider>().To<ContextProvider>().InRequestScope();
             kernel.Bind<ICachedContextProvider>().To<CachedContextProvider>().InRequestScope();
-            kernel.Bind<IAuthorisationProviderFactory>().ToMethod(ctx => new AuthorisationProviderFactory(ctx.Kernel)).InRequestScope();
-
-            // option 1
-            // kernel.Bind<IAuthorisationComparisionProvider>().To<AuthorisationComparisionProvider>().InRequestScope();
-            
-            // option 2
-            kernel.Bind<IAuthorisationComparisionProvider>().ToMethod(ctx=>
-            {
-                var legacyProvider = ctx.Kernel.Get<IAuthorisationLegacyProvider>();
-                var cachedContextProvider = ctx.Kernel.Get<ICachedContextProvider>();
-                return new AuthorisationComparisionProvider(cachedContextProvider, legacyProvider);
-            }).InRequestScope();
+            kernel.Bind<IAuthorisationComparisionProvider>().To<AuthorisationComparisionProvider>().InRequestScope();
+            kernel.Bind<IAuthorisationProviderFactory>().To<AuthorisationProviderFactory>().InRequestScope();
         }
     }
 }

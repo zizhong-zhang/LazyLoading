@@ -10,11 +10,13 @@ namespace Common
     
     public class AuthorisationProviderFactory : IAuthorisationProviderFactory
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Lazy<IAuthorisationComparisionProvider> _comparisionProvider;
+        private readonly Lazy<IAuthorisationLegacyProvider> _legacyProvider;
 
-        public AuthorisationProviderFactory(IServiceProvider serviceProvider)
+        public AuthorisationProviderFactory(Lazy<IAuthorisationComparisionProvider> comparisionProvider, Lazy<IAuthorisationLegacyProvider> legacyProvider)
         {
-            _serviceProvider = serviceProvider;
+            _comparisionProvider = comparisionProvider;
+            _legacyProvider = legacyProvider;
         }
 
         public IAuthorisationProvider GetAuthorisationProvider(int number)
@@ -22,9 +24,9 @@ namespace Common
             switch (number)
             {
                 case 0:
-                    return _serviceProvider.GetRequiredService<IAuthorisationComparisionProvider>();
+                    return _comparisionProvider.Value;
                 default:
-                    return _serviceProvider.GetRequiredService<IAuthorisationLegacyProvider>();
+                    return _legacyProvider.Value;
             }
         }
     }
